@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:clickable="false">
+
+
+    <ImageView
+        android:id="@+id/progresswrench"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:src="@drawable/ic_wrench"
+        android:clickable="false"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Please wait..."
+        android:textSize="@dimen/textSmall.size"
+        android:layout_marginLeft="20dp"
+        android:textColor="@color/color_black"
+        android:id="@+id/textView3" />
+
+
+</LinearLayout>
