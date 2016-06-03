@@ -42,7 +42,9 @@ public class RestClient {
     }
     public interface RestInterface {
 
-       //GET query for All Weather Information
+        //GET query for All Weather Information
+        // If you want to see any other place information find delhi in below api url and replace with your choice city(like mumbai etc.)
+
         @GET("yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22delhi%2C%20in%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys")
         Call<Root> getYahooWeather() ;
 

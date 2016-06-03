@@ -4,5 +4,13 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="internetconnection">Please check your internet connection</string>
+    <string name="serverfailure">Please try after some moments...</string>
 
+    <string name="windstring">WIND</string>
+    <string name="pressurestring">PRESSURE</string>
+    <string name="humiditystring">HUMIDITY</string>
+    <string name="visibilitystring">VISIBILITY</string>
+    <string name="sunrisestring">SUNRISE</string>
+    <string name="sunsetstring">SUNSET</string>
 </resources>

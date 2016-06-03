@@ -3,18 +3,19 @@ package com.showers.main;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.showers.R;
 import com.showers.model.ViewModel;
 import com.showers.restModel.Root;
 import com.showers.restclient.RestClient;
+import com.showers.utility.MyUtility;
+import com.showers.utility.Progressdialog;
 import com.showers.utility.UnitUtility;
 import com.thbs.skycons.library.CloudHvRainView;
 import com.thbs.skycons.library.CloudMoonView;
@@ -39,13 +40,15 @@ import retrofit2.Call;
 /**
  * Created by vikrant on 01/6/16.
  */
+
+// This class display Current date weather information
 public class HomeFragment extends Fragment{
     private SimpleDateFormat srcFormatter=new SimpleDateFormat("yyyy-MM-dd");
-    private RecyclerView recyclerView;
     private static List<ViewModel> items = new ArrayList<>();
+    private Context context;
     private View root;
-    private AppCompatActivity mContext;
-    // UI elements
+    private Progressdialog key_progressbar;
+    // Declare UI elements
     private TextView cityText, dayDateText;
     private TextView condDescr;
     private TextView temp;
@@ -55,15 +58,11 @@ public class HomeFragment extends Fragment{
     private TextView unitTemp;
     private TextView visibility;
     private TextView hum;
-//    private TextView tempMin;
-//    private TextView tempMax;
     private TextView sunset;
     private TextView sunrise;
     private LinearLayout dayView;
     private LinearLayout mainView;
-    private TextView colorTextLine;
-    private TextView rain;
-    private Context context;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         root = (View) inflater.inflate(R.layout.content_main, null);
@@ -78,19 +77,24 @@ public class HomeFragment extends Fragment{
         press = (TextView) root.findViewById(R.id.pressure);
         windSpeed = (TextView) root.findViewById(R.id.windSpeed);
         windDeg = (TextView) root.findViewById(R.id.windDeg);
-//        tempMin = (TextView) root.findViewById(R.id.tempMin);
-//        tempMax = (TextView) root.findViewById(R.id.tempMax);
         unitTemp = (TextView) root.findViewById(R.id.tempUnit);
         visibility = (TextView) root.findViewById(R.id.visibility);
         sunrise = (TextView) root.findViewById(R.id.sunrise);
         sunset = (TextView) root.findViewById(R.id.sunset);
-        //cloud = (TextView) root.findViewById(R.id.cloud);
-        //rain = (TextView) root.findViewById(R.id.rain);
-        getHomePageImages();
+
+        // check internet connection
+        if(MyUtility.isConnected(context)) {
+            //initialize progress dialog
+            key_progressbar = (Progressdialog) Progressdialog.show(context);
+            // this function get all json data from yahoo api and use current information
+            getCurrentWeatherUpdates();
+        }
+        else
+            Toast.makeText(context, getString(R.string.internetconnection), Toast.LENGTH_LONG).show();
         return root;
     }
 
-    private void getHomePageImages() {
+    private void getCurrentWeatherUpdates() {
 
         RestClient.RestInterface service = RestClient.getClient(getActivity());
         Call<Root> call = service.getYahooWeather();
@@ -100,10 +104,13 @@ public class HomeFragment extends Fragment{
                 if (response != null && response.isSuccessful() && response.errorBody() == null){
                     Date createdDate = null;
                     try {
+                        //get created date
                         createdDate = srcFormatter.parse(response.body().getQuery().getCreated());
                     } catch (ParseException ex) {
                         ex.printStackTrace();
                     }
+
+                    // create object of Skycons library
                     SunView sunView = new SunView(context);
                     MoonView moonView = new MoonView(context);
                     SkyconView skyconView = new SkyconView(context);
@@ -115,10 +122,10 @@ public class HomeFragment extends Fragment{
                     CloudView cloudView = new CloudView(context);
                     WindView windView = new WindView(context);
 
+                    // change background of icons
                     sunView.setBgColor(context.getResources().getColor(android.R.color.transparent));
                     cloudHvRainView.setBgColor(context.getResources().getColor(android.R.color.transparent));
                     skyconView.setBgColor(context.getResources().getColor(android.R.color.transparent));
-
                     moonView.setBgColor(context.getResources().getColor(android.R.color.transparent));
                     thunderView.setBgColor(context.getResources().getColor(android.R.color.transparent));
                     cloudRainView.setBgColor(context.getResources().getColor(android.R.color.transparent));
@@ -132,8 +139,11 @@ public class HomeFragment extends Fragment{
                             LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                     layout.setLayoutParams(params);
                     int dayCode = Integer.parseInt(response.body().getQuery().getResults().getChannel().getItem().getCondition().getCode());
+
+                    // get current sdk version
                     final int sdk = android.os.Build.VERSION.SDK_INT;
 
+                    // in these statement change background image according with current weather
                     if(dayCode == 27 || dayCode == 29){
                         //mostly cloudy (night)
                         if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
@@ -166,6 +176,8 @@ public class HomeFragment extends Fragment{
                         }
                     }
 
+
+                    // here we can change icon of current weather using yahoo api code
                     if(dayCode == 4 || dayCode == 47){
                         dayView.addView(thunderView);
                     }
@@ -196,6 +208,8 @@ public class HomeFragment extends Fragment{
 
 
                     SimpleDateFormat expectedDateFormat = new SimpleDateFormat("EEE, MMM d, ''yy");
+
+                    // set yahoo data information
                     cityText.setText(response.body().getQuery().getResults().getChannel().getLocation().getCity() + "," + response.body().getQuery().getResults().getChannel().getLocation().getCountry());
                     condDescr.setText(response.body().getQuery().getResults().getChannel().getItem().getCondition().getText());
                     dayDateText.setText(expectedDateFormat.format(createdDate));
@@ -208,12 +222,22 @@ public class HomeFragment extends Fragment{
                     sunrise.setText(response.body().getQuery().getResults().getChannel().getAstronomy().getSunrise());
                     sunset.setText(response.body().getQuery().getResults().getChannel().getAstronomy().getSunset());
 
+                    if(key_progressbar!=null)
+                    {
+                        key_progressbar.cancel();
+                    }
                 }else{
 
                 }
             }
             @Override
             public void onFailure(Call<Root> call, Throwable t) {
+                if(key_progressbar!=null)
+                {
+                    key_progressbar.cancel();
+                }
+                //in case request not failure
+                Toast.makeText(context, getString(R.string.serverfailure), Toast.LENGTH_LONG).show();
                 t.printStackTrace();
             }
         });

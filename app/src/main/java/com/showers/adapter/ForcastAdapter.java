@@ -25,8 +25,10 @@ import com.thbs.skycons.library.WindView;
 import java.util.List;
 
 /**
- * Created by vikrant on 30/05/16.
+ * Created by vikrant on 01/06/16.
  */
+
+// Adapter for forcast activity
 public class ForcastAdapter extends RecyclerView.Adapter<ForcastAdapter.ViewHolder> {
     private List<ViewModel> itemsData;
     private int displayType;
