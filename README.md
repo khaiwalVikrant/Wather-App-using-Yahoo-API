@@ -15,6 +15,10 @@ Showers is an basic application of weather updates using Yahoo api. It shows dai
 
 ### Instruction for running ###
 
+
+* You can easily see your city weather information, change city name in api endpoint
+
+
 * Check out with master branch 
 * How to run tests
 * Deployment instructions
